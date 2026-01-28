@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(del \"C:\\\\Users\\\\DSWDSRV-CARAGA\\\\Desktop\\\\post-monitoring\\\\frontend\\\\src\\\\App.css\")",
+      "Bash(del \"C:\\\\Users\\\\DSWDSRV-CARAGA\\\\Desktop\\\\post-monitoring\\\\frontend\\\\src\\\\assets\\\\react.svg\")",
+      "Bash(npm run build:*)",
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__list-routes",
+      "mcp__laravel-boost__database-schema",
+      "mcp__laravel-boost__search-docs",
+      "Bash(dir \"C:\\\\Users\\\\DSWDSRV-CARAGA\\\\Desktop\\\\post-monitoring\\\\frontend\\\\src\" /b)",
+      "Bash(dir \"C:\\\\Users\\\\DSWDSRV-CARAGA\\\\Desktop\\\\post-monitoring\\\\frontend\\\\src\\\\lib\" /b)",
+      "Bash(dir \"C:\\\\Users\\\\DSWDSRV-CARAGA\\\\Desktop\\\\post-monitoring\\\\frontend\\\\src\\\\pages\" /b)",
+      "Bash(dir \"C:\\\\Users\\\\DSWDSRV-CARAGA\\\\Desktop\\\\post-monitoring\\\\frontend\\\\src\\\\components\" /b)",
+      "Bash(php artisan install:api:*)",
+      "Bash(php artisan:*)",
+      "Bash(ren:*)",
+      "mcp__laravel-boost__tinker",
+      "Bash(vendor/bin/pint:*)",
+      "Bash(grep:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
+}
