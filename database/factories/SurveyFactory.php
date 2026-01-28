@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Incident;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -35,6 +36,7 @@ class SurveyFactory extends Factory
 
         return [
             'user_id' => User::factory(),
+            'incident_id' => Incident::factory(),
             'client_uuid' => Str::uuid()->toString(),
             'consent_agreed' => true,
             'beneficiary_name' => fake()->name(),

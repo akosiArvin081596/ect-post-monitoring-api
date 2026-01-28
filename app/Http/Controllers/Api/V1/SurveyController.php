@@ -20,7 +20,7 @@ class SurveyController extends Controller
     {
         $query = $request->user()
             ->surveys()
-            ->with('uploads');
+            ->with(['uploads', 'incident']);
 
         $updatedSince = $request->query('updated_since');
         if ($updatedSince) {
@@ -48,7 +48,7 @@ class SurveyController extends Controller
             ->first();
 
         if ($existing) {
-            return (new SurveyResource($existing->load('uploads')))
+            return (new SurveyResource($existing->load(['uploads', 'incident'])))
                 ->response()
                 ->setStatusCode(200);
         }
@@ -57,7 +57,7 @@ class SurveyController extends Controller
             ->surveys()
             ->create($request->validated());
 
-        return (new SurveyResource($survey->load('uploads')))
+        return (new SurveyResource($survey->load(['uploads', 'incident'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -66,7 +66,7 @@ class SurveyController extends Controller
     {
         $this->authorize('view', $survey);
 
-        return new SurveyResource($survey->load('uploads'));
+        return new SurveyResource($survey->load(['uploads', 'incident']));
     }
 
     public function update(UpdateSurveyRequest $request, Survey $survey): SurveyResource
@@ -75,7 +75,7 @@ class SurveyController extends Controller
 
         $survey->update($request->validated());
 
-        return new SurveyResource($survey->load('uploads'));
+        return new SurveyResource($survey->load(['uploads', 'incident']));
     }
 
     public function destroy(Request $request, Survey $survey): JsonResponse

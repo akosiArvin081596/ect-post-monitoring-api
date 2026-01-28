@@ -77,6 +77,14 @@ class Survey extends Model
     }
 
     /**
+     * @return BelongsTo<Incident, $this>
+     */
+    public function incident(): BelongsTo
+    {
+        return $this->belongsTo(Incident::class);
+    }
+
+    /**
      * @return HasMany<SurveyUpload, $this>
      */
     public function uploads(): HasMany

@@ -18,6 +18,7 @@ class StoreSurveyRequest extends FormRequest
     {
         return [
             'client_uuid' => ['required', 'string', 'uuid', 'max:36'],
+            'incident_id' => ['required', 'integer', 'exists:incidents,id'],
             'consent_agreed' => ['required', 'boolean'],
             'beneficiary_name' => ['required', 'string', 'max:255'],
             'respondent_name' => ['required', 'string', 'max:255'],

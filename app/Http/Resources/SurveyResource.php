@@ -15,6 +15,7 @@ class SurveyResource extends JsonResource
         return [
             'id' => $this->id,
             'client_uuid' => $this->client_uuid,
+            'incident_id' => $this->incident_id,
             'consent_agreed' => $this->consent_agreed,
             'beneficiary_name' => $this->beneficiary_name,
             'respondent_name' => $this->respondent_name,
@@ -62,6 +63,7 @@ class SurveyResource extends JsonResource
             'survey_modality' => $this->survey_modality,
             'modality_specify' => $this->modality_specify,
             'uploads' => SurveyUploadResource::collection($this->whenLoaded('uploads')),
+            'incident' => new IncidentResource($this->whenLoaded('incident')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
