@@ -12,16 +12,30 @@ use App\Models\Survey;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Carbon;
 
 class SurveyController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $surveys = $request->user()
+        $query = $request->user()
             ->surveys()
-            ->with('uploads')
-            ->latest()
-            ->paginate(20);
+            ->with('uploads');
+
+        $updatedSince = $request->query('updated_since');
+        if ($updatedSince) {
+            try {
+                $query->where('updated_at', '>', Carbon::parse($updatedSince));
+            } catch (\Throwable $exception) {
+            }
+        }
+
+        $perPage = (int) $request->query('per_page', 20);
+        $perPage = max(1, min(200, $perPage));
+
+        $surveys = $query
+            ->latest('updated_at')
+            ->paginate($perPage);
 
         return SurveyResource::collection($surveys);
     }

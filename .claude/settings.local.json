@@ -20,7 +20,8 @@
       "Bash(ren:*)",
       "mcp__laravel-boost__tinker",
       "Bash(vendor/bin/pint:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(find:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
