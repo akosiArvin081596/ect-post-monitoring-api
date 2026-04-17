@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\AddressBarangay;
 use App\Models\AddressMunicipality;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -50,5 +51,23 @@ class AddressController extends Controller
             ->pluck('municipality');
 
         return response()->json($municipalities);
+    }
+
+    public function barangays(Request $request): JsonResponse
+    {
+        $request->validate([
+            'province' => ['required', 'string'],
+            'district' => ['required', 'string'],
+            'municipality' => ['required', 'string'],
+        ]);
+
+        $barangays = AddressBarangay::query()
+            ->where('province', $request->query('province'))
+            ->where('district', $request->query('district'))
+            ->where('municipality', $request->query('municipality'))
+            ->orderBy('barangay')
+            ->pluck('barangay');
+
+        return response()->json($barangays);
     }
 }

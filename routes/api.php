@@ -31,4 +31,5 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/addresses/provinces', [AddressController::class, 'provinces']);
     Route::get('/addresses/districts', [AddressController::class, 'districts']);
     Route::get('/addresses/municipalities', [AddressController::class, 'municipalities']);
+    Route::get('/addresses/barangays', [AddressController::class, 'barangays']);
 });
