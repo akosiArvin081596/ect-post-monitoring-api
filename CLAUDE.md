@@ -1,3 +1,82 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**ECT Post Monitoring** is a Laravel 12 API backend for DSWD-CARAGA (Department of Social Welfare and Development, CARAGA region, Philippines) that supports post-distribution monitoring of Emergency Cash Transfer (ECT) beneficiaries after disasters. Field surveyors (authenticated via mobile clients) submit beneficiary interviews tied to specific disaster incidents, with expense utilization data, GPS coordinates, and file attachments.
+
+The sibling PWA client lives at `../frontend` (React 19 + Vite + Dexie, offline-first) and is the only real consumer of this API. See `../frontend/CLAUDE.md` for client-side sync semantics, and note that data-contract changes (new `Survey` fields, Form Request rule changes, Resource output shape) almost always require coordinated edits in both repos — specifically in `frontend/src/lib/types.ts` (`SurveyFormData`, `toSnakeCase`) and `frontend/src/lib/sync.ts` (`mapApiSurveyToFormData`).
+
+## Common Commands
+
+```bash
+# First-time setup
+composer setup                               # Install deps, copy .env, key:generate, migrate, npm install+build
+
+# Run dev (server + queue + vite concurrently)
+composer run dev
+
+# Tests (Pest 4)
+composer run test                            # config:clear then php artisan test
+php artisan test --compact                   # Fast, concise output
+php artisan test --compact --filter=testName # Run a single test
+
+# Code formatting (run before finalizing changes)
+vendor/bin/pint --dirty
+
+# Artisan
+php artisan migrate:fresh --seed             # Reset DB + run all seeders
+php artisan make:test --pest SomeTest        # Prefer Pest for new tests (Feature by default)
+```
+
+Default seeded admin: `admin@dswd.gov.ph` / `password` (see `database/seeders/AdminUserSeeder.php`).
+
+Test DB is SQLite in-memory (see `phpunit.xml`); dev DB is MySQL (see `.env.example`, `DB_DATABASE=backend`).
+
+## Architecture
+
+### API surface
+
+All endpoints are versioned under `/api/v1` and defined in `routes/api.php`. Everything except `POST /login` and the public `GET /addresses/*` endpoints requires Sanctum bearer-token auth (`auth:sanctum`).
+
+Controllers live under `app/Http/Controllers/Api/V1/`. Each controller is thin: validation is delegated to Form Requests (`app/Http/Requests/`), responses go through Eloquent API Resources (`app/Http/Resources/`), and per-record authorization goes through Policies (`app/Policies/`).
+
+### Domain model
+
+Core entities and their relationships:
+
+- **User** — surveyor; has many `Survey`s. Uses Sanctum's `HasApiTokens`.
+- **Incident** — a disaster/emergency event (`is_active`, `starts_at`, `ends_at`). Has many surveys.
+- **Survey** — a single beneficiary interview. Belongs to a `User` and an `Incident`, has many `SurveyUpload`s. Uses `SoftDeletes`.
+- **SurveyUpload** — photo/signature attachment (`photo_with_id`, `respondent_signature`, `interviewer_signature`) stored on the `public` disk under `survey-uploads/{survey_id}/`.
+- **AddressMunicipality** — reference table driving the cascading Province → District → Municipality dropdowns.
+
+### Patterns worth knowing before making changes
+
+1. **Offline-first idempotency via `client_uuid`**. `SurveyController@store` checks for an existing `client_uuid` and returns the existing record with `200` instead of creating a duplicate — this is what lets the mobile client safely retry submissions after flaky network conditions. Preserve this behavior when touching `store()`.
+
+2. **Auto-computed totals on Survey save**. The `Survey` model's `booted()` hook recomputes `total_utilization` (sum of all `expense_*` fields) and `unutilized_variance` (`amount_received - total_utilization`) on every save. Do not set these manually in controllers or factories — the hook will overwrite them. If you add new `expense_*` columns, update the `saving` listener in `app/Models/Survey.php`.
+
+3. **User-scoped data access**. Surveys are always scoped to the authenticated user: `index` uses `$request->user()->surveys()`, `show/update/destroy` go through `SurveyPolicy` which checks `user->id === survey->user_id`. The `BeneficiarySearchController` also filters by `user_id` — users only see beneficiaries they themselves surveyed. If you add new survey-adjacent endpoints, follow the same scoping.
+
+4. **Incremental sync endpoint**. `GET /api/v1/surveys?updated_since=<ISO>&per_page=<N>` drives pull-based sync from the mobile client. The `updated_since` filter uses `updated_at > ?`, paginated, ordered by `updated_at DESC`. `per_page` is clamped to `[1, 200]`.
+
+5. **`UpdateSurveyRequest` delegates to `StoreSurveyRequest`**. They share the same rules — update one, update both behaviors. Watch for this when adding fields.
+
+6. **JSON columns**. `beneficiary_classification`, `demographic_classification`, and `livelihood_types` are JSON arrays (multi-select). They're cast to `array` on the model.
+
+### Laravel 12 structural notes
+
+- Middleware and exception handlers are registered in `bootstrap/app.php`, not `app/Http/Kernel.php` (that file doesn't exist).
+- `statefulApi()` is enabled so Sanctum can work with both SPA cookie auth and token auth.
+- Service providers go in `bootstrap/providers.php`.
+- Console commands in `app/Console/Commands/` are auto-discovered.
+
+### Current test coverage
+
+Only Laravel's boilerplate `ExampleTest.php` exists in both `tests/Feature/` and `tests/Unit/`. Real feature tests for auth, surveys, uploads, and sync flows have not been written yet — when adding features, add coverage alongside.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
