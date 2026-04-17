@@ -62,6 +62,7 @@ class SurveyResource extends JsonResource
             'position' => $this->position,
             'survey_modality' => $this->survey_modality,
             'modality_specify' => $this->modality_specify,
+            'surveyor_device' => $this->surveyor_device,
             'uploads' => SurveyUploadResource::collection($this->whenLoaded('uploads')),
             'incident' => new IncidentResource($this->whenLoaded('incident')),
             'created_at' => $this->created_at,

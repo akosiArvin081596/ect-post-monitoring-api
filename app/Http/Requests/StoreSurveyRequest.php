@@ -66,6 +66,7 @@ class StoreSurveyRequest extends FormRequest
             'position' => ['required', 'string', 'max:255'],
             'survey_modality' => ['required', 'string', 'max:255'],
             'modality_specify' => ['nullable', 'string', 'max:255'],
+            'surveyor_device' => ['nullable', 'string', 'in:Mobile,Tablet,Desktop'],
         ];
     }
 }

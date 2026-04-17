@@ -75,6 +75,7 @@ class SurveyFactory extends Factory
             'position' => fake()->randomElement(['Social Worker', 'Field Officer', 'Enumerator']),
             'survey_modality' => fake()->randomElement(['Face-to-face', 'Phone', 'Others']),
             'modality_specify' => null,
+            'surveyor_device' => fake()->randomElement(['Mobile', 'Tablet', 'Desktop', null]),
         ];
     }
 }
